@@ -141,7 +141,7 @@ export default function GameClient({
             ))}
           </div>
 
-          <div className="mb-4 h-3 text-lg text-gray-700">{feedback}</div>
+          <div className="mb-4 h-3 w-full text-center text-lg text-gray-700">{feedback}</div>
           <div className="w-full text-center h-3 text-gray-500 text-sm">Versuche: {tries}</div>
 
           {success && (
