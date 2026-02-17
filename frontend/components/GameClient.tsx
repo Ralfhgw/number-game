@@ -104,7 +104,7 @@ export default function GameClient({
       <div className="mt-40 flex flex-col items-start">
         <h2 className="w-full text-center text-2xl font-bold mb-4 text-gray-500">
           Hallo, {name}!
-        </h2>505
+        </h2>
         { /* BoxContainer */}
         <div className={containerStyle}>
           {digits.map((digit, idx) => (
