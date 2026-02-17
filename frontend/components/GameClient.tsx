@@ -24,6 +24,14 @@ export default function GameClient({
     useRef<HTMLInputElement>(null),
   ];
 
+  const fetchHighscoreList = async () => {
+    const res = await fetch("/api/highscore", { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      setLocalHighscoreList(data);
+    }
+  };
+
   useEffect(() => {
     if (activeIndex < 3) {
       inputRefs[activeIndex].current?.focus();
@@ -68,31 +76,16 @@ export default function GameClient({
     setActiveIndex(0);
   };
 
-  // Server Action für Highscore
-  const now = new Date();
-  const created_at = `${String(now.getDate()).padStart(2, "0")}-${String(now.getMonth() + 1).padStart(2, "0")}-${now.getFullYear()} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-
   const handleHighscore = async () => {
     const result = await saveHighscore(name, tries + 1);
     if (result.status === "created") {
       setFeedback("Neuer Highscore eingetragen!");
-      setLocalHighscoreList(
-        localHighscoreList.map(entry =>
-          entry.name === name
-            ? { ...entry, score: tries + 1, created_at }
-            : entry
-        )
-      );
     } else if (result.status === "updated") {
       setFeedback("Highscore verbessert!");
-      setLocalHighscoreList(
-        localHighscoreList.map(entry =>
-          entry.name === name ? { ...entry, score: tries + 1 } : entry
-        )
-      );
     } else {
       setFeedback("Geschafft! (Kein neuer Highscore)");
     }
+    await fetchHighscoreList();
   };
 
   // Style Box and BoxContainer
@@ -100,67 +93,72 @@ export default function GameClient({
   const containerStyle = "flex justify-center items-center my-8";
 
   return (
-    <div className="flex flex-col items-center justify-start h-300 bg-linear-to-br from-gray-100 to-gray-300">
-      <div className="mt-40 flex flex-col items-start">
-        <h2 className="w-full text-center text-2xl font-bold mb-4 text-gray-500">
-          Hallo, {name}!
-        </h2>
-        { /* BoxContainer */}
-        <div className={containerStyle}>
-          {digits.map((digit, idx) => (
-            <input
-              key={idx}
-              ref={inputRefs[idx]}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              disabled={success}
-              onChange={e => handleChange(idx, e.target.value.replace(/\D/, ""))}
-              className={`${boxStyle} ${activeIndex === idx ? "border-gray-900 ring-2" : ""} 
-              focus:outline-none text-gray-500 text-center select-none`}
-              style={{
-                boxShadow: "0 4px 16px rgba(0,0,0,0.15), 0 1.5px 0 #ccc",
-                perspective: "500px",
-                transform: "rotateX(10deg) rotateY(5deg)",
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="mb-4 h-3 text-lg text-gray-700">{feedback}</div>
-        <div className=" h-3 text-gray-500 text-sm">Versuche: {tries}</div>
-        <div className="h-30 mt-8 flex flex-col items-start w-full max-w-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">Highscoreliste</h3>
-          <ul className="w-full bg-gray-300 rounded shadow p-4">
+    <div className="flex flex-row h-screen items-center justify-center bg-linear-to-br from-gray-100 to-gray-300">
+      <div className="flex flex-row justify-start gap-30">
+        { /* Left Box */ }
+        <div className="rounded-xl flex flex-col items-start w-full">
+          <h3 className="w-full text-center text-lg font-semibold text-gray-700 mb-2">Highscoreliste</h3>
+          <ul className="w-full rounded shadow p-4">
             {localHighscoreList.length === 0 && <li className="text-black">Noch keine Einträge</li>}
             {localHighscoreList
               .sort((a, b) => a.score - b.score)
               .map((entry, idx) => (
-                <li key={entry.name} className="flex justify-between py-1 text-gray-700 border-b last:border-b-0">
+                <li key={entry.name} className="flex flex-row items-center justify-between gap-16 py-1 text-gray-700 border-b last:border-b-0">
                   <span>
                     {idx + 1}. {entry.name}
                   </span>
                   <span>{entry.score}</span>
-                  <span className="ml-4 text-xs text-gray-500">{entry.created_at}</span>
+                  <span className="text-xs text-gray-500">{entry.created_at}</span>
                 </li>
               ))}
           </ul>
         </div>
-        {success && (
-          <button
-            className="self-center mt-6 h-10 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded shadow"
-            onClick={() => {
-              setRandomNumber(Math.floor(100 + Math.random() * 900));
-              setTries(0);
-              setSuccess(false);
-              setFeedback("");
-              resetInput();
-            }}
-          >
-            Nochmal spielen
-          </button>
-        )}
+        { /* Right Box*/ }
+        <div className="h-60 flex flex-col items-start">
+          <h2 className="w-full text-center text-2xl font-bold mb-4 text-gray-500">
+            Hallo, {name}!
+          </h2>
+          { /* BoxContainer */}
+          <div className={containerStyle}>
+            {digits.map((digit, idx) => (
+              <input
+                key={idx}
+                ref={inputRefs[idx]}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                disabled={success}
+                onChange={e => handleChange(idx, e.target.value.replace(/\D/, ""))}
+                className={`${boxStyle} ${activeIndex === idx ? "border-gray-900 ring-2" : ""} 
+              focus:outline-none text-gray-500 text-center select-none`}
+                style={{
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.15), 0 1.5px 0 #ccc",
+                  perspective: "500px",
+                  transform: "rotateX(10deg) rotateY(5deg)",
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="mb-4 h-3 text-lg text-gray-700">{feedback}</div>
+          <div className="w-full text-center h-3 text-gray-500 text-sm">Versuche: {tries}</div>
+
+          {success && (
+            <button
+              className="self-center mt-6 h-10 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded shadow"
+              onClick={() => {
+                setRandomNumber(Math.floor(100 + Math.random() * 900));
+                setTries(0);
+                setSuccess(false);
+                setFeedback("");
+                resetInput();
+              }}
+            >
+              Nochmal spielen
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
