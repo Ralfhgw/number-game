@@ -4,7 +4,7 @@ import type { HighscoreEntry } from "@/types/types";
 import GameInput from "@/components/GameInput";
 import HighscoreList from "@/components/HighscoreList";
 import { checkNumberAndHandleHighscore } from "@/utils/gameLogic";
-
+import { handleChangeUtil } from "@/utils/handleChange";
 import Image from "next/image";
 
 export default function GameClient({
@@ -29,7 +29,7 @@ export default function GameClient({
     useRef<HTMLInputElement>(null),
   ];
 
-  // Fetch /api/highscore
+  // Fetch /api/highscore 
   const fetchHighscoreList = async () => {
     const res = await fetch("/api/highscore", { cache: "no-store" });
     if (res.ok) {
@@ -46,22 +46,15 @@ export default function GameClient({
   }, [activeIndex]);
 
   const handleChange = (idx: number, value: string) => {
-    if (value !== "" && !/^\d$/.test(value)) {
-      setInvalidIndex(idx);
-      setTimeout(() => setInvalidIndex(null), 1000);
-      return;
-    }
-
-    const newDigits = [...digits];
-    newDigits[idx] = value;
-    setDigits(newDigits);
-
-    if (value && idx < 2) {
-      setActiveIndex(idx + 1);
-    }
-    if (idx === 2 && value) {
-      checkNumber([...newDigits.slice(0, 2), value].join(""));
-    }
+    handleChangeUtil({
+      idx,
+      value,
+      digits,
+      setDigits,
+      setActiveIndex,
+      setInvalidIndex,
+      checkNumber,
+    });
   };
 
   const resetInput = () => {
