@@ -1,15 +1,5 @@
 import React from "react";
-
-type GameInputProps = {
-  digits: string[];
-  activeIndex: number;
-  success: boolean;
-  invalidIndex: number | null;
-  inputRefs: React.RefObject<HTMLInputElement | null>[];
-  handleChange: (idx: number, value: string) => void;
-  boxStyle: string;
-  containerStyle: string;
-};
+import { GameInputProps } from "@/types/types"
 
 export default function GameInput({
   digits,
