@@ -23,11 +23,11 @@ jobs:
 
       - name: Run Vitest
         run: npx vitest run
-        working-directory: frontend/app/components
+        working-directory: frontend/app
 
       - name: Build
         run: npm run build
-        working-directory: frontend/app
+        working-directory: frontend/
 
 #      - name: Deploy to Server
 #        if: success()
