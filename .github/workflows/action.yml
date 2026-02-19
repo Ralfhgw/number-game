@@ -23,7 +23,7 @@ jobs:
 
       - name: Run Vitest
         run: npx vitest run
-        working-directory: frontend/app
+        working-directory: frontend/app/components
 
       - name: Build
         run: npm run build
