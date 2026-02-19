@@ -31,7 +31,7 @@ jobs:
 
       - name: Build
         run: npm run build
-        working-directory: server
+        working-directory: frontend/app
 
 #      - name: Deploy to Server
 #        if: success()
