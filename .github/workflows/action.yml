@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env: 
+        POSTGRES_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -19,11 +21,12 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-        working-directory: frontend/app
+        working-directory: frontend/
 
       - name: Run Vitest
         run: npx vitest run
-        working-directory: frontend/app
+        working-directory: frontend/
+        
 
       - name: Build
         run: npm run build
