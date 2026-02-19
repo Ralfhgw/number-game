@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env: 
-        POSTGRES_URL: ${{ secrets.DATABASE_URL }}
+        POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
