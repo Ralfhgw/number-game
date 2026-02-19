@@ -2,7 +2,6 @@ import GameClient from "@/components/GameClient";
 import sql from "@/components/db"; 
 import { HighscoreEntry } from "@/types/types"
 
-
 async function getHighscoreList() {
   const result = await sql`
     SELECT name, score, TO_CHAR(created_at, 'DD-MM-YYYY HH24:MI') AS created_at
